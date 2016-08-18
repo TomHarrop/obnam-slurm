@@ -11,7 +11,7 @@ source "${script_dir}/bash_header"
 printf "[ %s: Running backup script %s ]\n" "$(date)" "${0}"
 
 OPTIND=1
-while getopts "c:b:f:g:G:p:" opt; do
+while getopts ":c:b:f:g:G:p:" opt; do
     case "${opt}" in
         c)  config_file="${OPTARG}"
             printf "   config_file: %s\n" "${config_file}"

@@ -15,7 +15,7 @@ log_dir=""
 source "${script_dir}/bash_header"
 
 OPTIND=1
-while getopts "c:l:" opt; do
+while getopts ":c:l:" opt; do
   case "${opt}" in
 	c)  config_file="${OPTARG}"
 		printf "  config_file: %s\n" "${config_file}"
@@ -40,7 +40,7 @@ shift "$((OPTIND-1))"
 # check variables
 if [[ ! "${log_dir-}" ]]; then
     log_dir="/var/log/obnam"
-    printf "    log_dir: %s\n" "${log_dir}"
+    printf "      log_dir: %s\n" "${log_dir}"
 fi
 if [[ ! "${config_file-}" ]]; then
     printf "ERROR: specify config_file with -c\n" 1>&2
