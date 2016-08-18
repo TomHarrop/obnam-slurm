@@ -54,12 +54,12 @@ obnam --no-default-configs --config="$config_file" \
 # forget old snapshots
 printf "[ %s: Running forget ]\n" "$(date)"
 obnam --no-default-configs --config="$config_file" \
-	--log="$forget_logfile" forget
+    --log="$forget_logfile" forget
 
 # check generations
 printf "[ %s: Listing generations ]\n" "$(date)"
 obnam --no-default-configs --config="$config_file" \
-	--log="$gen_logfile" generations &> "$gen_output"
+    --log="$gen_logfile" generations &> "$gen_output"
 
 printf "[ %s: Done ]\n" "$(date)"
 

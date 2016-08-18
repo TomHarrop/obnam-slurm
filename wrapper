@@ -49,35 +49,35 @@ profile_file="${log_dir}/obnam.prof"
 
 # backup and email job
 run_backup() {
-	
-	THEN="$(date)"
+  
+  THEN="$(date)"
 
-	# run the backup	
-	srun --job-name=backup --cpus-per-task=1 --output="${script_output}" \
-		--nice=1 backup \
+  # run the backup  
+  srun --job-name=backup --cpus-per-task=1 --output="${script_output}" \
+    --nice=1 backup \
     -c "${config_file}" -b "${backup_logfile}" -f "${forget_logfile}" \
     -g "${gen_logfile}" -G "${gen_output}" -p "${profile_file}"
 
-	# mail the output
-	# email notification (move to wrapper)
-	cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
-    	--attach="${backup_logfile}" --attach="${forget_logfile}" \
-    	--attach="${gen_logfile}" ${USER}
+  # mail the output
+  # email notification (move to wrapper)
+  cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
+      --attach="${backup_logfile}" --attach="${forget_logfile}" \
+      --attach="${gen_logfile}" ${USER}
 
-			Backups started at ${THEN} finished. Logs are attached.
+      Backups started at ${THEN} finished. Logs are attached.
 
-			Backup generations:
+      Backup generations:
 
-			$(cat "${gen_output}")
+      $(cat "${gen_output}")
 
-			Job output:
+      Job output:
 
-			$(cat "${script_output}")
+      $(cat "${script_output}")
 
 _EOF_
   
-	# tidy up
-	rm "${backup_logfile}" "${forget_logfile}" "${gen_logfile}" \
+  # tidy up
+  rm "${backup_logfile}" "${forget_logfile}" "${gen_logfile}" \
     "${gen_output}" "${script_output}"
 } 
 
@@ -86,11 +86,11 @@ JOBID="$(squeue -n backup -o %A | sed -n 2p)"
 
 # exit or run backup
 if [[ "${JOBID}" ]]; then
-	echo "" | mail -s \
-		"[Tom@SLURM] WARNING backup script still in squeue after two hours" \
+  echo "" | mail -s \
+    "[Tom@SLURM] WARNING backup script still in squeue after two hours" \
     "${USER}"
 else
-	run_backup
+  run_backup
 fi
 
 exit 0
