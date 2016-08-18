@@ -1,15 +1,21 @@
 #!/bin/bash
 
-source "bash_header"
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+backup_script="${script_dir}/backup"
+
+printf "   script_dir: %s\n" "${script_dir}"
+printf "backup_script: %s\n" "${backup_script}"
+
+source "${script_dir}/bash_header"
 
 OPTIND=1
 while getopts "c:l:" opt; do
   case "${opt}" in
     c)  config_file="${OPTARG}"
-        printf "config_file: %s\n" "${config_file}"
+        printf " config_file: %s\n" "${config_file}"
         ;;
     l)  log_dir="${OPTARG}"
-        printf "    log_dir: %s\n" "${log_dir}"
+        printf "     log_dir: %s\n" "${log_dir}"
         ;;
     :)  printf "Option -%s requires an argument.\n" "${OPTARG}" >&2
         exit 1
@@ -54,7 +60,7 @@ run_backup() {
 
   # run the backup  
   srun --job-name=backup --cpus-per-task=1 --output="${script_output}" \
-    --nice=1 backup \
+    --nice=1 "${backup_script}" \
     -c "${config_file}" -b "${backup_logfile}" -f "${forget_logfile}" \
     -g "${gen_logfile}" -G "${gen_output}" -p "${profile_file}"
 

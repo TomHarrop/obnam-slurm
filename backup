@@ -5,7 +5,8 @@
 #SBATCH --output slurm.log.txt
 #SBATCH --nice=1
 
-source "bash_header"
+script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "${script_dir}/bash_header"
 
 printf "[ %s: Running backup script %s ]\n" "$(date)" "${0}"
 
