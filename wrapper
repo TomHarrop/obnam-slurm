@@ -2,6 +2,7 @@
 
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 backup_script="${script_dir}/backup"
+mail_user="$(id -u -n)"
 
 printf "   script_dir: %s\n" "${script_dir}"
 printf "backup_script: %s\n" "${backup_script}"
@@ -68,7 +69,7 @@ run_backup() {
   # email notification (move to wrapper)
   cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
       --attach="${backup_logfile}" --attach="${forget_logfile}" \
-      --attach="${gen_logfile}" ${USER}
+      --attach="${gen_logfile}" ${mail_user}
 
       Backups started at ${THEN} finished. Logs are attached.
 
@@ -94,7 +95,7 @@ JOBID="$(squeue -n backup -o %A | sed -n 2p)"
 if [[ "${JOBID}" ]]; then
   echo "" | mail -s \
     "[Tom@SLURM] WARNING backup script still in squeue after two hours" \
-    "${USER}"
+    "${mail_user}"
 else
   run_backup
 fi
