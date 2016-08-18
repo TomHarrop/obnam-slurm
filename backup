@@ -12,32 +12,32 @@ printf "[ %s: Running backup script %s ]\n" "$(date)" "${0}"
 
 OPTIND=1
 while getopts "c:b:f:g:G:p:" opt; do
-  case "${opt}" in
-    c)  config_file="${OPTARG}"
-        printf "   config_file: %s\n" "${config_file}"
-        ;;
-    b)  backup_logfile="${OPTARG}"
-        printf "backup_logfile: %s\n" "${backup_logfile}"
-        ;;
-    f)  forget_logfile="${OPTARG}"
-        printf "forget_logfile: %s\n" "${forget_logfile}"
-        ;;
-    g)  gen_logfile="${OPTARG}"
-        printf "   gen_logfile: %s\n" "${gen_logfile}"
-        ;;
-    G)  gen_output="${OPTARG}"
-        printf "    gen_output: %s\n" "${gen_output}"
-        ;;
-    p)  profile_file="${OPTARG}"
-        printf "  profile_file: %s\n" "${profile_file}"
-        ;;
-    :)  printf "Option -%s requires an argument.\n" "${OPTARG}" >&2
-        exit 1
-        ;;
-    \?) printf "Invalid option: -%s\n" "${OPTARG}" >&2
-        exit 1
-        ;;
-  esac
+    case "${opt}" in
+        c)  config_file="${OPTARG}"
+            printf "   config_file: %s\n" "${config_file}"
+            ;;
+        b)  backup_logfile="${OPTARG}"
+            printf "backup_logfile: %s\n" "${backup_logfile}"
+            ;;
+        f)  forget_logfile="${OPTARG}"
+            printf "forget_logfile: %s\n" "${forget_logfile}"
+            ;;
+        g)  gen_logfile="${OPTARG}"
+            printf "   gen_logfile: %s\n" "${gen_logfile}"
+            ;;
+        G)  gen_output="${OPTARG}"
+            printf "    gen_output: %s\n" "${gen_output}"
+            ;;
+        p)  profile_file="${OPTARG}"
+            printf "  profile_file: %s\n" "${profile_file}"
+            ;;
+        :)  printf "Option -%s requires an argument.\n" "${OPTARG}" >&2
+            exit 1
+            ;;
+        \?) printf "Invalid option: -%s\n" "${OPTARG}" >&2
+            exit 1
+            ;;
+    esac
 done
 shift "$((OPTIND-1))"
 
