@@ -1,0 +1,96 @@
+#!/bin/bash
+
+source "bash_header"
+
+OPTIND=1
+while getopts "c:l:" opt; do
+  case "${opt}" in
+    c)  config_file="${OPTARG}"
+        printf "config_file: %s\n" "${config_file}"
+        ;;
+    l)  log_dir="${OPTARG}"
+        printf "    log_dir: %s\n" "${log_dir}"
+        ;;
+    :)  printf "Option -%s requires an argument.\n" "${OPTARG}" >&2
+        exit 1
+        ;;
+    \?) printf "Invalid option: -%s\n" "${OPTARG}" >&2
+        exit 1
+        ;;
+  esac
+done
+shift "$((OPTIND-1))"
+
+#####################
+### START WRAPPER ###
+#####################
+
+# check variables
+if [[ ! "${log_dir-}" ]]; then
+  log_dir="/var/log/obnam"
+  printf "    log_dir: %s\n" "${log_dir}"
+fi
+if [[ ! "${config_file-}" ]]; then
+  printf "ERROR: specify config_file with -c\n" 1>&2
+  exit 1
+fi
+if [[ ! -e "${config_file}" ]]; then
+  printf "ERROR: config_file \"%s\" not found\n" "${config_file}" 1>&2
+  exit 1
+fi
+
+# set file variables
+backup_logfile="${log_dir}/backup.log.txt"
+forget_logfile="${log_dir}/forget.log.txt"
+gen_logfile="${log_dir}/generations.log.txt"
+gen_output="${log_dir}/generations.txt"
+script_output="${log_dir}/slurm.log.txt"
+profile_file="${log_dir}/obnam.prof"
+
+# backup and email job
+run_backup() {
+	
+	THEN="$(date)"
+
+	# run the backup	
+	srun --job-name=backup --cpus-per-task=1 --output="${script_output}" \
+		--nice=1 backup \
+    -c "${config_file}" -b "${backup_logfile}" -f "${forget_logfile}" \
+    -g "${gen_logfile}" -G "${gen_output}" -p "${profile_file}"
+
+	# mail the output
+	# email notification (move to wrapper)
+	cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
+    	--attach="${backup_logfile}" --attach="${forget_logfile}" \
+    	--attach="${gen_logfile}" ${USER}
+
+			Backups started at ${THEN} finished. Logs are attached.
+
+			Backup generations:
+
+			$(cat "${gen_output}")
+
+			Job output:
+
+			$(cat "${script_output}")
+
+_EOF_
+  
+	# tidy up
+	rm "${backup_logfile}" "${forget_logfile}" "${gen_logfile}" \
+    "${gen_output}" "${script_output}"
+} 
+
+# check for running backup
+JOBID="$(squeue -n backup -o %A | sed -n 2p)"
+
+# exit or run backup
+if [[ "${JOBID}" ]]; then
+	echo "" | mail -s \
+		"[Tom@SLURM] WARNING backup script still in squeue after two hours" \
+    "${USER}"
+else
+	run_backup
+fi
+
+exit 0
