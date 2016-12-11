@@ -97,7 +97,7 @@ jobid="$(squeue -n backup -o %A | sed -n 2p)"
 # exit or run backup
 if [[ "${jobid}" ]]; then
     echo "" | mail -s \
-        "[Tom@SLURM] WARNING backup script still in squeue after two hours" \
+        "[Tom@SLURM] Backup WARNING: script still in squeue after two hours" \
         "${mail_user}"
 else
     run_backup
