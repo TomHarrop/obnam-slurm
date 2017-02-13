@@ -58,6 +58,7 @@ gen_logfile="${log_dir}/generations.log.txt"
 gen_output="${log_dir}/generations.txt"
 script_output="${log_dir}/slurm.log.txt"
 profile_file="${log_dir}/obnam.prof"
+log_archive="${log_dir}/logs.tar.gz"
 
 # backup and email job
 run_backup() {
@@ -70,11 +71,15 @@ run_backup() {
     -c "${config_file}" -b "${backup_logfile}" -f "${forget_logfile}" \
     -g "${gen_logfile}" -G "${gen_output}" -p "${profile_file}"
 
+    # compress the logs for emailing (tar -zxf)
+    tar --create --gzip "--file=${log_archive}" \
+        "${backup_logfile}" "${forget_logfile}" "${gen_logfile}"
+
     # mail the output
     # email notification (move to wrapper)
+
     cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
-        --attach="${backup_logfile}" --attach="${forget_logfile}" \
-        --attach="${gen_logfile}" ${mail_user}
+        --attach="${log_archive}" "${mail_user}"
 			Backups started at ${THEN} finished. Logs are attached.
 
 			Backup generations:
@@ -88,7 +93,7 @@ _EOF_
   
     # tidy up
     rm "${backup_logfile}" "${forget_logfile}" "${gen_logfile}" \
-        "${gen_output}" "${script_output}"
+        "${gen_output}" "${script_output}" "${log_archive}"
     } 
 
 # check for running backup
