@@ -76,8 +76,6 @@ run_backup() {
         "${backup_logfile}" "${forget_logfile}" "${gen_logfile}"
 
     # mail the output
-    # email notification (move to wrapper)
-
     cat <<- _EOF_ | mail -s "[Tom@SLURM] Backup script finished at $(date)" \
         --attach="${log_archive}" "${mail_user}"
 			Backups started at ${THEN} finished. Logs are attached.
